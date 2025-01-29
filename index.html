@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Status Checker</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .status {
+            font-size: 10rem;
+            font-weight: bold;
+        }
+        input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="apiKey" placeholder="Enter API Key" />
+    <button onclick="checkAPI()">Check API</button>
+    <div class="status" id="status">⏳</div>
+    
+    <script>
+        async function checkAPI() {
+            const apiKey = document.getElementById("apiKey").value;
+            if (!apiKey) {
+                alert("Please enter your API key.");
+                return;
+            }
+            
+            const url = "https://api.openai.com/v1/chat/completions";
+            
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo", // 가장 저렴한 모델 사용
+                        messages: [{"role": "user", "content": "tell me 'O'"}]
+                    })
+                });
+
+                const responseData = await response.json();
+                console.log(responseData); // 응답을 콘솔에 출력
+                
+                if (response.ok) {
+                    document.getElementById("status").textContent = "O";
+                    document.getElementById("status").style.color = "green";
+                } else {
+                    document.getElementById("status").textContent = "X";
+                    document.getElementById("status").style.color = "red";
+                }
+            } catch (error) {
+                console.log(error); // 오류도 콘솔에 출력
+                document.getElementById("status").textContent = "X";
+                document.getElementById("status").style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
